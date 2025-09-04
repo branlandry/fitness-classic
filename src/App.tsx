@@ -1,4 +1,5 @@
 // @ts-nocheck
+console.log("BUILD MARKER:", new Date().toISOString());
 import { useState, useMemo } from 'react';
 import { ChevronDown, ChevronRight, BookOpen, Upload, Info } from 'lucide-react';
 import Papa from 'papaparse';
@@ -1003,11 +1004,10 @@ export default function BiomarkerApp() {
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
             <h3 className="font-bold text-gray-900 mb-3">System-Based Coaching Approach:</h3>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li>• <strong>Assess patterns</strong> within each supergroup to identify primary focus areas</li>
-              <li>• <strong>Address foundational systems</strong> (Recovery & Circulation) before pushing performance</li>
-              <li>• <strong>Use group patterns</strong> to guide periodization and training emphasis</li>
-              <li>• <strong>Remember:</strong> you're interpreting for fitness guidance, not medical diagnosis</li>
-              <li>• <strong>Navigation:</strong> Click any section header to expand/collapse - multiple sections can be open at once</li>
+              <li>• <strong>Assess patterns</strong> within each supergroup to identify primary focus areas.</li>
+              <li>• <strong>Address foundational systems</strong> before pushing performance.</li>
+              <li>• <strong>Use group patterns</strong> to guide periodization and training emphasis.</li>
+              <li>• <strong>Remember:</strong> you're interpreting for fitness guidance, not medical diagnosis.</li>
             </ul>
           </div>
 
