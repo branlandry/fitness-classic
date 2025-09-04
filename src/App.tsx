@@ -760,12 +760,12 @@ const PersonalizedCoachingGuide = ({ enrichedData }) => {
       <div className="mb-8 p-4 bg-gray-50 rounded-lg">
         <h2 className="font-bold text-gray-900 mb-3">System-Based Coaching Principles</h2>
         <ul className="text-sm text-gray-700 space-y-1">
-          <li>→ Assess patterns within each system to identify focus areas</li>
-          <li>→ Address foundational systems (Recovery & Circulation) before pushing performance</li>
-          <li>→ Use system patterns to guide periodization and training emphasis</li>
-          <li>→ Remember: This is for fitness guidance, not medical diagnosis</li>
-          <li>→ Start conservative and progress based on client response</li>
-          <li>→ Monitor subjective feelings alongside objective markers</li>
+          <li>→ Assess patterns within each system to identify focus areas.</li>
+          <li>→ Address foundational systems before pushing performance.</li>
+          <li>→ Use system patterns to guide periodization and training emphasis.</li>
+          <li>→ Remember: This is for fitness guidance, not medical diagnosis.</li>
+          <li>→ Start conservative and progress based on client response.</li>
+          <li>→ Monitor subjective feelings alongside objective markers.</li>
         </ul>
       </div>
 
