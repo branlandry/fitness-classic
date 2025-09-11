@@ -49,7 +49,7 @@ const Uploader = ({ onFile, error }) => {
         <div className="mb-1 text-sm font-medium text-gray-900">Upload Client Biomarker Data</div>
         <div className="mb-3 flex items-center gap-2 text-xs text-gray-600">
           <Info className="h-4 w-4" />
-          CSV with columns: MEASURE_NAME, LAB_CONCENTRATION, COLOR, SCORE
+          CSV with columns: MEASURE_NAME, LAB_CONCENTRATION, COLOR, SCORE, UNDETECTED_STATUS
         </div>
         <label
           className={`mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-10 text-sm transition ${
@@ -89,11 +89,33 @@ const Uploader = ({ onFile, error }) => {
 const BiomarkerCard = ({ subgroup, clientData, isSelected, onSelect }) => {
   const markerDetails = subgroup.markers.map(markerName => {
     const clientRow = clientData.get(markerName);
+    let score = clientRow ? parseIncomingScore(clientRow) : null;
+    let displayNote = "";
+    
+    // Add display note for undetected cases (normalize for comparison)
+    const undetectedStatus = (clientRow?.UNDETECTED_STATUS || "").toString().toLowerCase().trim();
+    const color = (clientRow?.COLOR || "").toString().toLowerCase().trim();
+    
+    if (undetectedStatus === 'below_loq') {
+      if (color === 'green') {
+        displayNote = " (below detection limit - optimal)";
+      } else {
+        displayNote = " (below detection limit)";
+      }
+    } else if (undetectedStatus === 'below_lod') {
+      if (color === 'green') {
+        displayNote = " (below limit of detection - optimal)";
+      } else {
+        displayNote = " (below limit of detection)";
+      }
+    }
+    
     return {
       name: markerName,
       color: clientRow?.COLOR || "",
       labConcentration: clientRow?.LAB_CONCENTRATION || "no data",
-      score: clientRow ? parseIncomingScore(clientRow) : null
+      score: score,
+      displayNote: displayNote
     };
   });
 
@@ -112,11 +134,11 @@ const BiomarkerCard = ({ subgroup, clientData, isSelected, onSelect }) => {
         <div>
           <div className="flex items-center gap-2">
             <h4 className="font-semibold text-gray-700">{subgroup.name}</h4>
-{/*            {aggregatedScore !== null && (
+            {/* Score hidden for product - {aggregatedScore !== null && (
               <span className="text-xs font-mono bg-purple-100 text-purple-800 px-2 py-1 rounded">
                 Score: {aggregatedScore}
               </span>
-            )}*/}
+            )} */}
           </div>
           <div className="text-xs text-gray-500 mt-1">{markerDetails.length} marker{markerDetails.length !== 1 ? 's' : ''}</div>
         </div>
@@ -196,18 +218,23 @@ const BiomarkerCard = ({ subgroup, clientData, isSelected, onSelect }) => {
                         {marker.name}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {marker.labConcentration !== "no data" ? `Lab value: ${marker.labConcentration}` : "No data available"}
+                        {marker.labConcentration !== "no data" ? `Lab value: ${marker.labConcentration}${marker.displayNote}` : "No data available"}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {(statusLabel.text === "Borderline" || statusLabel.text === "Out of range") && (
                         <span>
-                          ⚠
+                          ⚠️
                         </span>
                       )}
                       <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-800">
                         {statusLabel.text}
                       </span>
+                      {/* Individual marker scores hidden for product - {marker.score !== null && (
+                        <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-mono">
+                          {marker.score}
+                        </span>
+                      )} */}
                     </div>
                   </div>
                 );
@@ -319,7 +346,7 @@ const PersonalizedCoachingGuide = ({ enrichedData }) => {
                             <span
                               className={`font-bold`}
                             >
-                              ⚠
+                              ⚠️
                             </span>
                           )}
                           <span className="font-bold text-xs text-gray-800 bg-gray-200 px-1 rounded">
@@ -387,10 +414,12 @@ export default function BiomarkerApp() {
         const enrichedSubgroups = Object.entries(groupData.subgroups).map(([subgroupName, subgroupData]) => {
           const markerDetails = subgroupData.markers.map(markerName => {
             const clientRow = clientMap.get(markerName);
+            let score = clientRow ? parseIncomingScore(clientRow) : null;
+            
             return {
               name: markerName,
               color: clientRow?.COLOR || "",
-              score: clientRow ? parseIncomingScore(clientRow) : null
+              score: score
             };
           });
           
@@ -438,6 +467,7 @@ export default function BiomarkerApp() {
       if (!Object.prototype.hasOwnProperty.call(rows[0] || {}, "MEASURE_NAME")) {
         throw new Error('Client CSV missing required column: "MEASURE_NAME"');
       }
+      
       setClientRows(rows.filter((r) => r.MEASURE_NAME));
     } catch (e) {
       setError(e?.message || "Failed to parse client CSV");
@@ -529,11 +559,11 @@ export default function BiomarkerApp() {
                 >
                   <div className="flex items-center gap-3">
                     <h2 className="text-xl font-bold">{supergroupData.name}</h2>
-{/*                    {clientRows && (
+                    {/* Score hidden for product - {clientRows && (
                       <span className="text-sm font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded">
                         Score: {supergroupData.score !== null ? supergroupData.score : 'no data'}
                       </span>
-                    )}*/}
+                    )} */}
                   </div>
                   <div className="flex items-center gap-3">
                     {clientRows && (
@@ -567,6 +597,11 @@ export default function BiomarkerApp() {
                           >
                             <div className="flex items-center gap-3">
                               <h3 className="font-semibold">{groupData.name}</h3>
+                              {/* Score hidden for product - {clientRows && (
+                                <span className="text-sm font-mono bg-green-100 text-green-800 px-2 py-1 rounded">
+                                  Score: {groupData.score !== null ? groupData.score : 'no data'}
+                                </span>
+                              )} */}
                             </div>
                             <div className="flex items-center gap-3">
                               {clientRows && (
