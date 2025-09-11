@@ -19,10 +19,10 @@ const ScoreCircle = ({ score, size = "large" }) => {
   const sizeClasses = size === "small" ? "w-6 h-6" : "w-8 h-8";
   
   return (
-    <div className={`${sizeClasses} rounded-full border-2`}
+    <div className={`${sizeClasses} rounded-full border`}
          style={{ 
            backgroundColor: band ? band.bg : "#e5e7eb",
-           borderColor: band ? band.bg : "#d1d5db"
+           borderColor: "#d1d5db"
          }}>
     </div>
   );
