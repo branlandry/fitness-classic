@@ -1,7 +1,7 @@
 // @ts-nocheck
 console.log("BUILD MARKER:", new Date().toISOString());
 import { useState, useMemo } from 'react';
-import { ChevronDown, ChevronRight, BookOpen, Upload, Info } from 'lucide-react';
+import { ChevronDown, ChevronRight, Upload, Info, User, Activity, Heart, Zap, Shield, Download } from 'lucide-react';
 import { biomarkerStructure } from './config/biomarker_structure'
 import { SCORE_BANDS, colorLabel } from './config/scoring_constants'
 import { 
@@ -14,240 +14,68 @@ import {
 import { parseCsv } from './utils/csv_parser';
 
 // Components
-const ScoreBar = ({ score }) => {
+const ScoreCircle = ({ score, size = "large" }) => {
   const band = scoreBandLabel(score);
-
-  return (
-    <div className="w-full h-5 bg-gray-200 rounded-full overflow-hidden relative border border-gray-400">
-      <div 
-        className="h-5 w-full"   // always full width
-        style={{ 
-          backgroundColor: band ? band.bg : "#e5e7eb" 
-        }} 
-      />
-      {band && (
-        <span className={`absolute inset-0 flex items-center justify-center text-xs font-semibold ${band.text}`}>
-          {band.label}
-        </span>
-      )}
-      {score === null && (
-        <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-gray-600">
-          no data
-        </span>
-      )}
-    </div>
-  );
-};
-
-
-const Uploader = ({ onFile, error }) => {
-  const [dragOver, setDragOver] = useState(false);
+  const sizeClasses = size === "small" ? "w-6 h-6" : "w-8 h-8";
   
   return (
-    <div className="mb-6">
-      <div className="rounded-xl border bg-white p-5 shadow">
-        <div className="mb-1 text-sm font-medium text-gray-900">Upload Client Biomarker Data</div>
-        <div className="mb-3 flex items-center gap-2 text-xs text-gray-600">
-          <Info className="h-4 w-4" />
-          CSV with columns: MEASURE_NAME, LAB_CONCENTRATION, COLOR, SCORE, UNDETECTED_STATUS
-        </div>
-        <label
-          className={`mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-10 text-sm transition ${
-            dragOver ? "bg-gray-50" : "bg-white"
-          }`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDragOver(false);
-            const file = e.dataTransfer.files?.[0];
-            if (file) onFile(file);
-          }}
-        >
-          <Upload className="h-5 w-5" />
-          Drop CSV here or click to choose
-          <input
-            type="file"
-            accept=".csv,text/csv"
-            className="hidden"
-            onChange={(e) => onFile(e.target.files?.[0] || null)}
-          />
-        </label>
-      </div>
-      {error && (
-        <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          {error}
-        </div>
-      )}
+    <div className={`${sizeClasses} rounded-full border-2`}
+         style={{ 
+           backgroundColor: band ? band.bg : "#e5e7eb",
+           borderColor: band ? band.bg : "#d1d5db"
+         }}>
     </div>
   );
 };
 
-const BiomarkerCard = ({ subgroup, clientData, isSelected, onSelect }) => {
-  const markerDetails = subgroup.markers.map(markerName => {
-    const clientRow = clientData.get(markerName);
-    let score = clientRow ? parseIncomingScore(clientRow) : null;
-    let displayNote = "";
-    
-    // Add display note for undetected cases (normalize for comparison)
-    const undetectedStatus = (clientRow?.UNDETECTED_STATUS || "").toString().toLowerCase().trim();
-    const color = (clientRow?.COLOR || "").toString().toLowerCase().trim();
-    
-    if (undetectedStatus === 'below_loq') {
-      if (color === 'green') {
-        displayNote = " (below detection limit - optimal)";
-      } else {
-        displayNote = " (below detection limit)";
-      }
-    } else if (undetectedStatus === 'below_lod') {
-      if (color === 'green') {
-        displayNote = " (below limit of detection - optimal)";
-      } else {
-        displayNote = " (below limit of detection)";
-      }
+const StatusBadge = ({ color }) => {
+  const statusLabel = colorLabel(color);
+  
+  return (
+    <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+      {statusLabel.text}
+    </span>
+  );
+};
+
+const BiomarkerRow = ({ marker, clientData }) => {
+  const clientRow = clientData.get(marker);
+  let score = clientRow ? parseIncomingScore(clientRow) : null;
+  let displayNote = "";
+  
+  const undetectedStatus = (clientRow?.UNDETECTED_STATUS || "").toString().toLowerCase().trim();
+  const color = (clientRow?.COLOR || "").toString().toLowerCase().trim();
+  
+  if (undetectedStatus === 'below_loq') {
+    if (color === 'green') {
+      displayNote = " (below detection limit - optimal)";
+    } else {
+      displayNote = " (below detection limit)";
     }
-    
-    return {
-      name: markerName,
-      color: clientRow?.COLOR || "",
-      labConcentration: clientRow?.LAB_CONCENTRATION || "no data",
-      score: score,
-      displayNote: displayNote
-    };
-  });
-
-  const aggregatedScore = aggregateWeightedScore(markerDetails);
-  const scoreCategory = getScoreCategory(aggregatedScore);
-  const coaching = subgroup.coaching;
+  } else if (undetectedStatus === 'below_lod') {
+    if (color === 'green') {
+      displayNote = " (below limit of detection - optimal)";
+    } else {
+      displayNote = " (below limit of detection)";
+    }
+  }
   
   return (
-    <div 
-      className={`border rounded-lg p-4 mb-3 cursor-pointer transition-all hover:shadow-md ${
-        isSelected ? 'border-blue-400 border-2 shadow-md' : 'border-gray-200 hover:border-gray-300'
-      }`}
-      onClick={onSelect}
-    >
-      <div className="flex justify-between items-center mb-2">
-        <div>
-          <div className="flex items-center gap-2">
-            <h4 className="font-semibold text-gray-700">{subgroup.name}</h4>
-            {/* Score hidden for product - {aggregatedScore !== null && (
-              <span className="text-xs font-mono bg-purple-100 text-purple-800 px-2 py-1 rounded">
-                Score: {aggregatedScore}
-              </span>
-            )} */}
-          </div>
-          <div className="text-xs text-gray-500 mt-1">{markerDetails.length} marker{markerDetails.length !== 1 ? 's' : ''}</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-20">
-            <ScoreBar score={aggregatedScore} />
-          </div>
-          <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'rotate-90' : ''}`} />
+    <div className="flex items-center justify-between py-3 px-4 border-b border-gray-100 hover:bg-gray-50">
+      <div className="flex-1">
+        <div className="font-medium text-gray-900">{marker}</div>
+        <div className="text-sm text-gray-500">
+          {clientRow?.LAB_CONCENTRATION ? `Result: ${clientRow.LAB_CONCENTRATION}${displayNote}` : "No data available"}
         </div>
       </div>
-      
-      {isSelected && (
-        <div className="space-y-4 mt-4">
-          <div className="bg-gray-50 border border-gray-200 rounded p-3">
-            <span className="font-medium text-sm">About this subgroup:</span>
-            <p className="text-gray-700 text-sm mt-1">{subgroup.description}</p>
-          </div>
-
-          {scoreCategory && coaching && (
-            <div className={`border rounded p-3`}>
-              <div className="space-y-2 text-sm">
-                {/* Health Context */}
-                {coaching[scoreCategory === 'optimal' ? 'optimal' : 
-                             scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention']?.healthContext && (
-                  <div>
-                    <span className="font-medium">Health Context:</span>
-                    <p className="text-gray-700 mt-1">
-                      {coaching[scoreCategory === 'optimal' ? 'optimal' : 
-                               scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention'].healthContext}
-                    </p>
-                  </div>
-                )}
-                
-                {/* Fitness Impact */}
-                {coaching[scoreCategory === 'optimal' ? 'optimal' : 
-                             scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention']?.implication && (
-                  <div>
-                    <span className="font-medium">Fitness Impact:</span>
-                    <p className="text-gray-700 mt-1">
-                      {coaching[scoreCategory === 'optimal' ? 'optimal' : 
-                               scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention'].implication}
-                    </p>
-                  </div>
-                )}
-                
-                <div>
-                  <span className="font-medium">Training Actions:</span>
-                  <p className="text-gray-700 mt-1">
-                    {coaching[scoreCategory === 'optimal' ? 'optimal' : 
-                             scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention'].action}
-                  </p>
-                </div>
-                
-                {coaching[scoreCategory === 'optimal' ? 'optimal' : 
-                         scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention']?.tips && (
-                  <div>
-                    <span className="font-medium">Coach Tips:</span>
-                    <p className="text-gray-700 mt-1">
-                      {coaching[scoreCategory === 'optimal' ? 'optimal' : 
-                               scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention'].tips}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="bg-white border border-gray-200 rounded p-3">
-            <span className="font-medium text-sm mb-2 block">Individual Markers ({markerDetails.length}):</span>
-            <div className="space-y-2">
-              {markerDetails.map((marker, idx) => {
-                const statusLabel = colorLabel(marker.color);
-                return (
-                  <div key={idx} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                    <div className="flex-1">
-                      <div className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                        {marker.name}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {marker.labConcentration !== "no data" ? `Lab value: ${marker.labConcentration}${marker.displayNote}` : "No data available"}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {(statusLabel.text === "Borderline" || statusLabel.text === "Out of range") && (
-                        <span>
-                          ⚠️
-                        </span>
-                      )}
-                      <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-800">
-                        {statusLabel.text}
-                      </span>
-                      {/* Individual marker scores hidden for product - {marker.score !== null && (
-                        <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-mono">
-                          {marker.score}
-                        </span>
-                      )} */}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="flex items-center gap-3">
+        <StatusBadge color={clientRow?.COLOR || ""} />
+      </div>
     </div>
   );
 };
 
-// PersonalizedCoachingGuide Component
+// PersonalizedCoachingGuide Component (for download)
 const PersonalizedCoachingGuide = ({ enrichedData }) => {
   const getCoachingGuidance = (score) => {
     const category = getScoreCategory(score);
@@ -257,7 +85,7 @@ const PersonalizedCoachingGuide = ({ enrichedData }) => {
   };
 
   return (
-    <div className="bg-white border rounded-lg p-6" style={{ fontFamily: 'system-ui, sans-serif' }}>
+    <div className="bg-white p-8" style={{ fontFamily: 'system-ui, sans-serif' }}>
       <div className="text-center mb-8 border-b-2 border-blue-500 pb-4">
         <h1 className="text-2xl font-bold text-blue-600 mb-2">Personalized Biomarker Coaching Guide</h1>
         <p className="text-gray-600">System-Based Training Approach • Customized for This Client</p>
@@ -343,11 +171,7 @@ const PersonalizedCoachingGuide = ({ enrichedData }) => {
                       <div className="mb-2" style={{ minHeight: '50px' }}>
                         <div className="flex items-center gap-1 mb-1">
                           {(guidanceType === 'needsAttention' || guidanceType === 'needsSupport') && (
-                            <span
-                              className={`font-bold`}
-                            >
-                              ⚠️
-                            </span>
+                            <span className="font-bold">⚠️</span>
                           )}
                           <span className="font-bold text-xs text-gray-800 bg-gray-200 px-1 rounded">
                             {guidanceType === 'optimal'
@@ -357,9 +181,9 @@ const PersonalizedCoachingGuide = ({ enrichedData }) => {
                               : 'ATTENTION'}
                           </span>
                         </div>
-                          <div className="text-gray-700 ml-2 leading-tight">
-                            {coaching.implication || coaching.action}
-                          </div>
+                        <div className="text-gray-700 ml-2 leading-tight">
+                          {coaching.implication || coaching.action}
+                        </div>
                       </div>
 
                       {/* Tips */}
@@ -389,13 +213,349 @@ const PersonalizedCoachingGuide = ({ enrichedData }) => {
   );
 };
 
-export default function BiomarkerApp() {
-  const [clientRows, setClientRows] = useState(null);
+const downloadCoachingGuide = (enrichedData) => {
+  const printWindow = window.open('', '_blank');
+  
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Personalized Biomarker Coaching Guide</title>
+      <style>
+        body { font-family: system-ui, sans-serif; margin: 0; padding: 20px; }
+        .no-print { display: none !important; }
+        @media print {
+          body { margin: 0; }
+          .page-break { page-break-after: always; }
+        }
+      </style>
+    </head>
+    <body>
+      <div style="text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #3b82f6; padding-bottom: 1rem;">
+        <h1 style="font-size: 1.5rem; font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">Personalized Biomarker Coaching Guide</h1>
+        <p style="color: #6b7280;">System-Based Training Approach • Customized for This Client</p>
+      </div>
+      
+      <div style="margin-bottom: 2rem; padding: 1rem; background-color: #f9fafb; border-radius: 0.5rem;">
+        <h2 style="font-weight: bold; color: #111827; margin-bottom: 0.75rem;">System-Based Coaching Principles</h2>
+        <ul style="font-size: 0.875rem; color: #374151; margin: 0; padding-left: 1.5rem;">
+          <li>→ Assess patterns within each system to identify focus areas.</li>
+          <li>→ Address foundational systems before pushing performance.</li>
+          <li>→ Use system patterns to guide periodization and training emphasis.</li>
+          <li>→ Remember: This is for fitness guidance, not medical diagnosis.</li>
+          <li>→ Start conservative and progress based on client response.</li>
+          <li>→ Monitor subjective feelings alongside objective markers.</li>
+        </ul>
+      </div>
+      
+      <div style="text-align: center; font-size: 0.75rem; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 1rem;">
+        <p><strong>Important:</strong> This guide is for fitness professionals to interpret biomarker patterns for training optimization. Always work within scope of practice. For medical concerns, refer to healthcare providers.</p>
+      </div>
+      
+      <div class="no-print" style="text-align: center; margin-top: 2rem;">
+        <button onclick="window.print()" style="background: #3b82f6; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">Print Guide</button>
+        <button onclick="window.close()" style="background: #6b7280; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-left: 0.5rem;">Close</button>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+};
+
+const ExecutiveSummary = ({ enrichedData, clientData }) => {
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Biomarker Overview</h1>
+        <p className="text-gray-600">
+          System-based biomarker analysis for training optimization and health insights.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {enrichedData.map((supergroup) => {
+          const icon = supergroup.name === "Health" ? Heart : 
+                      supergroup.name === "Performance" ? Zap : Shield;
+          const IconComponent = icon;
+          
+          return (
+            <div key={supergroup.name} className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <IconComponent className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-semibold text-gray-900">{supergroup.name}</h3>
+                <ScoreCircle score={supergroup.score} />
+              </div>
+              <p className="text-sm text-gray-600 mb-4">{supergroup.description}</p>
+              
+              <div className="space-y-2">
+                {supergroup.groups.map((group) => (
+                  <div key={group.name} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700">{group.name}</span>
+                    <ScoreCircle score={group.score} size="small" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {clientData.size === 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Info className="w-5 h-5 text-blue-600" />
+            <h3 className="font-semibold text-blue-900">No Client Data Loaded</h3>
+          </div>
+          <p className="text-blue-800 text-sm">
+            Upload a CSV file with client biomarker data to see personalized scores and recommendations.
+            Use the upload button in the top navigation to get started.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SubgroupDetail = ({ subgroup, clientData }) => {
+  const [biomarkersExpanded, setBiomarkersExpanded] = useState(false);
+  
+  const markerDetails = subgroup.markers.map(markerName => {
+    const clientRow = clientData.get(markerName);
+    let score = clientRow ? parseIncomingScore(clientRow) : null;
+    
+    return {
+      name: markerName,
+      color: clientRow?.COLOR || "",
+      score: score
+    };
+  });
+
+  const aggregatedScore = aggregateWeightedScore(markerDetails);
+  const scoreCategory = getScoreCategory(aggregatedScore);
+  const coaching = subgroup.coaching;
+  
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <div className="flex items-center gap-4 mb-4">
+          <h1 className="text-2xl font-semibold text-gray-900">{subgroup.name}</h1>
+          <ScoreCircle score={aggregatedScore} />
+        </div>
+        <p className="text-gray-600">{subgroup.description}</p>
+      </div>
+
+      {/* Coaching Section */}
+      {scoreCategory && coaching && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+          <h3 className="font-semibold text-gray-900 mb-4">Training Guidance</h3>
+          <div className="space-y-3 text-sm">
+            {coaching[scoreCategory === 'optimal' ? 'optimal' : 
+                     scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention']?.healthContext && (
+              <div>
+                <span className="font-medium text-gray-900">Health Context:</span>
+                <p className="text-gray-700 mt-1">
+                  {coaching[scoreCategory === 'optimal' ? 'optimal' : 
+                           scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention'].healthContext}
+                </p>
+              </div>
+            )}
+            
+            {coaching[scoreCategory === 'optimal' ? 'optimal' : 
+                     scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention']?.implication && (
+              <div>
+                <span className="font-medium text-gray-900">Training Impact:</span>
+                <p className="text-gray-700 mt-1">
+                  {coaching[scoreCategory === 'optimal' ? 'optimal' : 
+                           scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention'].implication}
+                </p>
+              </div>
+            )}
+            
+            <div>
+              <span className="font-medium text-gray-900">Recommended Actions:</span>
+              <p className="text-gray-700 mt-1">
+                {coaching[scoreCategory === 'optimal' ? 'optimal' : 
+                         scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention'].action}
+              </p>
+            </div>
+            
+            {coaching[scoreCategory === 'optimal' ? 'optimal' : 
+                     scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention']?.tips && (
+              <div>
+                <span className="font-medium text-gray-900">Coach Tips:</span>
+                <p className="text-gray-700 mt-1">
+                  {coaching[scoreCategory === 'optimal' ? 'optimal' : 
+                           scoreCategory === 'needs support' ? 'needsSupport' : 'needsAttention'].tips}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Biomarkers Section */}
+      <div className="bg-white border border-gray-200 rounded-lg">
+        <button
+          onClick={() => setBiomarkersExpanded(!biomarkersExpanded)}
+          className="w-full px-6 py-4 border-b border-gray-200 text-left hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-gray-900">Biomarkers ({markerDetails.length})</h3>
+            {biomarkersExpanded ? <ChevronDown className="w-5 h-5 text-gray-500" /> : <ChevronRight className="w-5 h-5 text-gray-500" />}
+          </div>
+        </button>
+        
+        {biomarkersExpanded && (
+          <div>
+            {subgroup.markers.map((marker, idx) => (
+              <BiomarkerRow key={idx} marker={marker} clientData={clientData} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const Sidebar = ({ enrichedData, selectedItem, onSelectItem, onUpload, hasData }) => {
   const [expandedSupergroups, setExpandedSupergroups] = useState({});
   const [expandedGroups, setExpandedGroups] = useState({});
-  const [selectedBiomarker, setSelectedBiomarker] = useState(null);
+
+  const toggleSupergroup = (name) => {
+    setExpandedSupergroups(prev => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  const toggleGroup = (supergroupName, groupName) => {
+    const key = `${supergroupName}-${groupName}`;
+    setExpandedGroups(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  return (
+    <div className="w-80 bg-white border-r border-gray-200 h-screen flex flex-col">
+      {/* Header */}
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center gap-2 mb-4">
+          <Activity className="w-6 h-6 text-blue-600" />
+          <h1 className="font-semibold text-gray-900">Biomarker Guide</h1>
+        </div>
+        
+        <label className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 cursor-pointer transition-colors">
+          <Upload className="w-3 h-3" />
+          Upload CSV
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => onUpload(e.target.files?.[0] || null)}
+          />
+        </label>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4">
+          {/* Overview */}
+          <button
+            onClick={() => onSelectItem(null)}
+            className={`w-full text-left px-3 py-2 rounded-md mb-2 transition-colors ${
+              selectedItem === null ? 'bg-blue-100 text-blue-900' : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              <span className="font-medium">Overview</span>
+            </div>
+          </button>
+
+          {/* Supergroups */}
+          {enrichedData.map((supergroup) => {
+            const isSupergroupExpanded = expandedSupergroups[supergroup.name];
+            const icon = supergroup.name === "Health" ? Heart : 
+                        supergroup.name === "Performance" ? Zap : Shield;
+            const IconComponent = icon;
+
+            return (
+              <div key={supergroup.name} className="mb-2">
+                <button
+                  onClick={() => toggleSupergroup(supergroup.name)}
+                  className="w-full text-left px-3 py-2 rounded-md transition-colors hover:bg-gray-100 text-gray-900"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <IconComponent className="w-4 h-4" />
+                      <span className="font-medium">{supergroup.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {hasData && <ScoreCircle score={supergroup.score} size="small" />}
+                      {isSupergroupExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    </div>
+                  </div>
+                </button>
+
+                {isSupergroupExpanded && (
+                  <div className="ml-4 mt-1">
+                    {supergroup.groups.map((group) => {
+                      const groupKey = `${supergroup.name}-${group.name}`;
+                      const isGroupExpanded = expandedGroups[groupKey];
+
+                      return (
+                        <div key={group.name} className="mb-1">
+                          <button
+                            onClick={() => toggleGroup(supergroup.name, group.name)}
+                            className="w-full text-left px-3 py-2 rounded-md transition-colors hover:bg-gray-50 text-gray-700 text-sm"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{group.name}</span>
+                              <div className="flex items-center gap-2">
+                                {hasData && <ScoreCircle score={group.score} size="small" />}
+                                {isGroupExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                              </div>
+                            </div>
+                          </button>
+
+                          {isGroupExpanded && (
+                            <div className="ml-4 mt-1">
+                              {group.subgroups.map((subgroup, idx) => {
+                                const subgroupKey = `${supergroup.name}-${group.name}-${idx}`;
+                                return (
+                                  <button
+                                    key={idx}
+                                    onClick={() => onSelectItem(subgroupKey)}
+                                    className={`w-full text-left px-3 py-2 rounded-md transition-colors text-xs ${
+                                      selectedItem === subgroupKey 
+                                        ? 'bg-blue-100 text-blue-900' 
+                                        : 'text-gray-600 hover:bg-gray-50'
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span>{subgroup.name}</span>
+                                      {hasData && <ScoreCircle score={subgroup.score} size="small" />}
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function BiomarkerApp() {
+  const [clientRows, setClientRows] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [error, setError] = useState(null);
-  const [showCoachingGuide, setShowCoachingGuide] = useState(false);
 
   const clientMap = useMemo(() => {
     const map = new Map();
@@ -474,180 +634,46 @@ export default function BiomarkerApp() {
     }
   };
 
-  const toggleSupergroup = (supergroupName) => {
-    setExpandedSupergroups(prev => ({
-      ...prev,
-      [supergroupName]: !prev[supergroupName]
-    }));
+  const getSelectedSubgroup = () => {
+    if (!selectedItem) return null;
+    
+    const parts = selectedItem.split('-');
+    if (parts.length !== 3) return null;
+    
+    const [supergroupName, groupName, subgroupIndex] = parts;
+    const supergroup = enrichedData.find(s => s.name === supergroupName);
+    if (!supergroup) return null;
+    
+    const group = supergroup.groups.find(g => g.name === groupName);
+    if (!group) return null;
+    
+    return group.subgroups[parseInt(subgroupIndex)] || null;
   };
 
-  const toggleGroup = (supergroupName, groupName) => {
-    const key = `${supergroupName}-${groupName}`;
-    setExpandedGroups(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
+  const selectedSubgroup = getSelectedSubgroup();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-3 mb-4">
-            <BookOpen className="w-8 h-8 text-blue-600" />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Molecular You Biomarker Guide</h1>
-              <p className="text-gray-600">Blood Biomarker Interpretation by Physiological Systems</p>
-            </div>
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar 
+        enrichedData={enrichedData}
+        selectedItem={selectedItem}
+        onSelectItem={setSelectedItem}
+        onUpload={onClientUpload}
+        hasData={clientRows !== null}
+      />
+      
+      <div className="flex-1 overflow-y-auto">
+        {error && (
+          <div className="mx-6 mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800 text-sm">{error}</p>
           </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
-              <strong>For Coaches:</strong> This guide organizes blood biomarkers by physiological systems to help you understand how different markers work together. Upload client CSV data to see personalized scores and recommendations.
-            </p>
-          </div>
-
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-            <h3 className="font-bold text-gray-900 mb-3">System-Based Coaching Approach:</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li>• <strong>Assess patterns</strong> within each supergroup to identify primary focus areas.</li>
-              <li>• <strong>Address foundational systems</strong> before pushing performance.</li>
-              <li>• <strong>Use group patterns</strong> to guide periodization and training emphasis.</li>
-              <li>• <strong>Remember:</strong> you're interpreting for fitness guidance, not medical diagnosis.</li>
-            </ul>
-          </div>
-
-          <Uploader onFile={onClientUpload} error={error} />
-
-          {clientRows && (
-            <div className="mt-6 bg-white rounded-lg border p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="font-semibold text-gray-900">Personalized Coaching Guide</h3>
-                  <p className="text-sm text-gray-600">Generate a custom coaching reference based on this client's biomarker results</p>
-                </div>
-                <button
-                  onClick={() => setShowCoachingGuide(!showCoachingGuide)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  {showCoachingGuide ? 'Hide Guide' : 'Generate Guide'}
-                </button>
-              </div>
-              
-              {showCoachingGuide && (
-                <div className="border-t pt-4">
-                  <PersonalizedCoachingGuide enrichedData={enrichedData} />
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="space-y-6">
-          {enrichedData.map((supergroupData) => {
-            const isSupergroupExpanded = expandedSupergroups[supergroupData.name];
-            const groupCount = supergroupData.groups.length;
-            
-            return (
-              <div key={supergroupData.name} className="bg-white rounded-lg shadow-sm border">
-                <button
-                  onClick={() => toggleSupergroup(supergroupData.name)}
-                  className="w-full bg-gray-100 text-gray-900 px-6 py-4 rounded-t-lg flex items-center justify-between hover:bg-gray-200 transition-colors border border-gray-200"
-                >
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-bold">{supergroupData.name}</h2>
-                    {/* Score hidden for product - {clientRows && (
-                      <span className="text-sm font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                        Score: {supergroupData.score !== null ? supergroupData.score : 'no data'}
-                      </span>
-                    )} */}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {clientRows && (
-                      <div className="w-32">
-                        <ScoreBar score={supergroupData.score} />
-                      </div>
-                    )}
-                    <span className="text-sm opacity-75">
-                      {groupCount} group{groupCount !== 1 ? 's' : ''}
-                    </span>
-                    {isSupergroupExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-                  </div>
-                </button>
-
-                {isSupergroupExpanded && (
-                  <div className="p-6">
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-                      <p className="text-sm text-gray-700">{supergroupData.description}</p>
-                    </div>
-
-                    {supergroupData.groups.map((groupData) => {
-                      const groupKey = `${supergroupData.name}-${groupData.name}`;
-                      const isGroupExpanded = expandedGroups[groupKey];
-                      const subgroupCount = groupData.subgroups.length;
-
-                      return (
-                        <div key={groupData.name} className="mb-6 last:mb-0">
-                          <button
-                            onClick={() => toggleGroup(supergroupData.name, groupData.name)}
-                            className="w-full bg-gray-100 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 flex items-center justify-between hover:bg-gray-200 transition-colors"
-                          >
-                            <div className="flex items-center gap-3">
-                              <h3 className="font-semibold">{groupData.name}</h3>
-                              {/* Score hidden for product - {clientRows && (
-                                <span className="text-sm font-mono bg-green-100 text-green-800 px-2 py-1 rounded">
-                                  Score: {groupData.score !== null ? groupData.score : 'no data'}
-                                </span>
-                              )} */}
-                            </div>
-                            <div className="flex items-center gap-3">
-                              {clientRows && (
-                                <div className="w-24">
-                                  <ScoreBar score={groupData.score} />
-                                </div>
-                              )}
-                              <span className="text-sm opacity-75">
-                                {subgroupCount} subgroup{subgroupCount !== 1 ? 's' : ''}
-                              </span>
-                              {isGroupExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-                            </div>
-                          </button>
-
-                          {isGroupExpanded && (
-                            <div className="mt-4">
-                              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-                                <p className="text-sm text-gray-700">{groupData.description}</p>
-                              </div>
-
-                              <div className="space-y-2">
-                                {groupData.subgroups.map((subgroup, index) => (
-                                  <BiomarkerCard
-                                    key={index}
-                                    subgroup={subgroup}
-                                    clientData={clientMap}
-                                    isSelected={selectedBiomarker === `${supergroupData.name}-${groupData.name}-${index}`}
-                                    onSelect={() => setSelectedBiomarker(
-                                      selectedBiomarker === `${supergroupData.name}-${groupData.name}-${index}` 
-                                        ? null 
-                                        : `${supergroupData.name}-${groupData.name}-${index}`
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        )}
+        
+        {selectedSubgroup ? (
+          <SubgroupDetail subgroup={selectedSubgroup} clientData={clientMap} />
+        ) : (
+          <ExecutiveSummary enrichedData={enrichedData} clientData={clientMap} />
+        )}
       </div>
     </div>
   );
