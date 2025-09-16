@@ -3,10 +3,10 @@ export const biomarkerStructure = {
   "Health": {
     description: "Blood markers that reveal how effectively your cardiovascular and neurological systems deliver oxygen, clear metabolic waste, and maintain the mental drive essential for consistent training performance. These indicators show whether the body's foundational systems can support demanding endurance work and sustained training motivation.",
     groups: {
-      "Vascular & Blood Flow": {
+      "Cardiovascular Health": {
         description: "Blood markers that reveal cardiovascular system readiness for training demands, showing how efficiently nutrients reach working muscles and waste products are cleared during exercise. These indicators determine whether circulation can support higher training volumes and faster recovery between sessions.",
         subgroups: {
-          "Endothelial activation & vessel health": {
+          "Blood Vessel Health": {
             description: "Blood markers reflecting blood vessel lining integrity that determine circulation efficiency and cardiovascular training capacity.",
             markers: ["Intercellular adhesion molecule 1", "L-selectin", "Cadherin-5", "Thrombospondin-1", "Angiogenin", "Vasorin", "von Willebrand Factor", "Pigment epithelium-derived factor", "Fibronectin"],
             coaching: {
@@ -27,7 +27,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Nitric oxide & vasodilation": {
+          "Blood Flow Capacity": {
             description: "Blood markers supporting blood vessel dilation and circulation enhancement that directly impact muscle pumps, endurance capacity, and exercise performance.",
             markers: ["Arginine", "Citrulline", "Ornithine", "Asymmetric dimethylarginine", "Acetyl-Ornithine"],
             coaching: {
@@ -48,7 +48,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Coagulation & clot regulation": {
+          "Clotting Balance": {
             description: "Blood markers reflecting circulation safety and clotting balance that determine training intensity tolerance and injury recovery potential.",
             markers: ["Fibrinogen alpha chain", "Fibrinogen beta chain", "Fibrinogen gamma chain", "Prothrombin", "Coagulation factor IX", "Coagulation factor X", "Coagulation factor XI", "Coagulation factor XII", "Coagulation factor XIII A chain", "Coagulation factor XIII B chain", "Plasminogen", "Protein S", "Antithrombin-III"],
             coaching: {
@@ -74,7 +74,7 @@ export const biomarkerStructure = {
       "Mental & Neural Readiness": {
         description: "Blood markers reflecting neurotransmitter production and brain chemistry balance that directly impact training motivation, stress resilience, and workout consistency. These indicators show whether neurological systems support challenging training and maintain positive training mindset.",
         subgroups: {
-          "Serotonin & mood": {
+          "Training Motivation": {
             description: "Blood markers supporting mood stability, training motivation, and positive mindset that directly impact program adherence and workout consistency.",
             markers: ["Serotonin", "Tryptophan", "Kynurenine"],
             coaching: {
@@ -95,7 +95,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "GABA & relaxation": {
+          "Stress Recovery": {
             description: "Blood markers supporting stress management, recovery readiness, and nervous system balance that determine training stress tolerance and adaptation capacity.",
             markers: ["Gamma-aminobutyric acid"],
             coaching: {
@@ -116,7 +116,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Dopaminergic precursors": {
+          "Mental Drive": {
             description: "Blood markers supporting motivation, focus, and drive that directly impact training intensity, skill acquisition, and consistent workout performance.",
             markers: ["Tyrosine", "Phenylalanine"],
             coaching: {
@@ -147,7 +147,7 @@ export const biomarkerStructure = {
       "Muscle & Strength Systems": {
         description: "Blood markers revealing protein synthesis capacity, muscle building potential, and strength development readiness. These indicators show whether cellular processes can support progressive muscle-building protocols and handle increased training volumes for optimal strength gains.",
         subgroups: {
-          "Muscle protein turnover": {
+          "Muscle Building": {
             description: "Blood markers reflecting the balance between muscle building and breakdown processes that determine training volume tolerance and strength development potential.",
             markers: ["Methylhistidine", "Creatine", "Creatinine", "Insulin-like growth factor-binding protein 2", "Insulin-like growth factor-binding protein 3", "Insulin-like growth factor-binding protein complex acid labile subunit"],
             coaching: {
@@ -168,7 +168,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Amino acids for synthesis": {
+          "Building Blocks": {
             description: "Blood markers providing essential building blocks for muscle protein synthesis that directly impact recovery speed, muscle growth, and training adaptation.",
             markers: ["Leucine", "Isoleucine", "Valine", "Lysine", "Methionine", "Histidine", "Glutamine"],
             coaching: {
@@ -189,7 +189,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Polyamines & growth support": {
+          "Growth Support": {
             description: "Blood markers supporting cellular growth, tissue repair, and training adaptation that determine recovery capacity and progression potential.",
             markers: ["Spermidine", "Putrescine"],
             coaching: {
@@ -215,7 +215,7 @@ export const biomarkerStructure = {
       "Energy Systems & Fueling": {
         description: "Blood markers that reveal metabolic efficiency for different fuel sources during exercise, showing how well carbohydrates, fats, and cellular energy pathways support workout performance. These indicators determine optimal nutrition timing and training intensity based on metabolic readiness.",
         subgroups: {
-          "Glucose & carbohydrate metabolism": {
+          "Carb metabolism": {
             description: "Blood markers reflecting carbohydrate processing efficiency and energy availability that determine workout fueling strategies and training intensity tolerance.",
             markers: ["Glucose", "Alanine"],
             coaching: {
@@ -236,7 +236,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Lipid transport & HDL function": {
+          "Fat Metabolism": {
             description: "Blood markers reflecting fat metabolism efficiency and cardiovascular health that support endurance performance and hormone production for training.",
             markers: ["Apolipoprotein A-I", "Apolipoprotein A-II", "Apolipoprotein A-IV", "Apolipoprotein C-I", "Apolipoprotein C-II", "Apolipoprotein C-III", "Phospholipid transfer protein", "Clusterin", "Zinc-alpha-2-glycoprotein"],
             coaching: {
@@ -257,7 +257,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Osmolytes & one-carbon metabolism": {
+          "Cellular Energy": {
             description: "Blood markers supporting cellular hydration, metabolic efficiency, and energy production that directly impact training capacity and recovery quality.",
             markers: ["Betaine", "Choline", "Taurine", "Trimethylamine N-oxide"],
             coaching: {
@@ -288,7 +288,7 @@ export const biomarkerStructure = {
       "Recovery & Adaptation": {
         description: "Blood markers reflecting inflammatory control, antioxidant capacity, and tissue repair efficiency after training stress. These indicators show whether recovery mechanisms can handle higher training frequencies and support consistent positive adaptations.",
         subgroups: {
-          "Inflammation & immune readiness": {
+          "Inflammation & Immune readiness": {
             description: "Blood markers reflecting inflammatory control and immune system function that determine training frequency tolerance and consistent workout availability.",
             markers: ["C-reactive protein", "Serum amyloid A-4 protein", "Alpha-1-acid glycoprotein 1", "Alpha-1-antichymotrypsin", "Alpha-1-antitrypsin", "Alpha-1B-glycoprotein", "Leucine-rich alpha-2-glycoprotein 1", "Lipopolysaccharide-binding protein", "Serum amyloid P-component", "Protein S100-A9", "Complement C3", "Complement C4-B", "Complement factor B", "Complement factor H"],
             coaching: {
@@ -309,7 +309,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Tissue repair & ECM remodeling": {
+          "Tissue Repair": {
             description: "Blood markers reflecting structural tissue repair and remodeling capacity that determine training progression safety and injury prevention potential.",
             markers: ["Fibronectin", "Vitronectin", "Lumican", "Fibulin-1", "Extracellular matrix protein 1", "Proteoglycan 4", "Tetranectin", "trans-OH-Proline"],
             coaching: {
@@ -330,8 +330,8 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Oxidative stress balance": {
-            description: "MBlood markers reflecting cellular stress management and antioxidant capacity that determine training intensity tolerance and recovery efficiency.",
+          "Stress Defense": {
+            description: "Blood markers reflecting cellular stress management and antioxidant capacity that determine training intensity tolerance and recovery efficiency.",
             markers: ["Glutathione peroxidase 3", "Peroxiredoxin-2", "Ceruloplasmin", "Methionine-Sulfoxide"],
             coaching: {
               optimal: {
@@ -356,7 +356,7 @@ export const biomarkerStructure = {
       "Joint & Connective Tissue": {
         description: "Blood markers revealing structural tissue health, bone density markers, and connective tissue turnover that determine injury risk and loading capacity. These indicators show whether joints and connective tissues can safely handle high-impact training and heavy resistance work.",
         subgroups: {
-          "Cartilage/bone markers": {
+          "Cartilage & Bone Health": {
             description: "Blood markers reflecting bone density and cartilage health that determine high-impact training capacity and joint loading tolerance.",
             markers: ["Cartilage acidic protein 1", "Alpha-2-HS-glycoprotein", "Fetuin-B", "Tetranectin"],
             coaching: {
@@ -377,7 +377,7 @@ export const biomarkerStructure = {
               }
             }
           },
-          "Collagen turnover": {
+          "Joint Health": {
             description: "Blood markers reflecting connective tissue health and remodeling that determine injury risk and capacity for demanding movement patterns.",
             markers: ["trans-OH-Proline", "Lumican", "Fibulin-1"],
             coaching: {

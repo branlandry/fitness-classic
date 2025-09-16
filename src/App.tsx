@@ -1,7 +1,7 @@
 // @ts-nocheck
 console.log("BUILD MARKER:", new Date().toISOString());
 import { useState, useMemo } from 'react';
-import { ChevronDown, ChevronRight, Upload, Info, User, Activity, Heart, Zap, Shield, Download } from 'lucide-react';
+import { ChevronDown, ChevronRight, Upload, Info, User, Activity, Heart, Zap, Shield, Download, ClipboardList } from 'lucide-react';
 import { biomarkerStructure } from './config/biomarker_structure'
 import { SCORE_BANDS, colorLabel } from './config/scoring_constants'
 import { 
@@ -12,6 +12,7 @@ import {
   getScoreCategory 
 } from './utils/score_calculations';
 import { parseCsv } from './utils/csv_parser';
+import { recommendationsData, getRecommendationsForBiomarker } from './config/recommendations_data';
 
 // Components
 const ScoreCircle = ({ score, size = "large" }) => {
@@ -71,6 +72,146 @@ const BiomarkerRow = ({ marker, clientData }) => {
       <div className="flex items-center gap-3">
         <StatusBadge color={clientRow?.COLOR || ""} />
       </div>
+    </div>
+  );
+};
+
+// ActionPlan Component - ONE SIMPLE CHANGE: Use actual LEVEL from CSV instead of hardcoded 'high'
+const ActionPlan = ({ clientData }) => {
+  const actionPlan = useMemo(() => {
+    if (clientData.size === 0) return [];
+
+    // Create a pool of all applicable recommendations
+    const recommendationPool = new Map();
+    
+    // Iterate through all client biomarkers
+    for (const [biomarkerName, clientRow] of clientData) {
+      const color = (clientRow?.COLOR || "").toString().toLowerCase().trim();
+      const level = (clientRow?.LEVEL || "").toString().toLowerCase().trim(); // Read actual level from CSV
+      
+      // Determine if biomarker is problematic and get weight
+      let weight = 0;
+      if (color === 'red') weight = 1;
+      else if (color === 'yellow') weight = 0.5;
+      
+      // Skip if biomarker is in normal range
+      if (weight === 0) continue;
+      
+      // CHANGED: Use actual level from CSV instead of hardcoded 'high'
+      // Skip if no level data
+      if (!level) continue;
+      
+      // Get recommendations for this biomarker using actual level from CSV
+      const recommendations = getRecommendationsForBiomarker(biomarkerName, level);
+      
+      recommendations.forEach(rec => {
+        const key = `${rec.action}_${rec.name}`;
+        
+        if (!recommendationPool.has(key)) {
+          recommendationPool.set(key, {
+            action: rec.action,
+            name: rec.name,
+            totalWeight: 0,
+            targetBiomarkers: []
+          });
+        }
+        
+        const poolItem = recommendationPool.get(key);
+        poolItem.totalWeight += weight;
+        poolItem.targetBiomarkers.push({
+          name: biomarkerName,
+          color: color,
+          weight: weight,
+          level: level  // Add level to display data
+        });
+      });
+    }
+    
+    // Convert to array and sort by total weight (descending), then alphabetically
+    const sortedRecommendations = Array.from(recommendationPool.values())
+      .sort((a, b) => {
+        if (b.totalWeight !== a.totalWeight) {
+          return b.totalWeight - a.totalWeight;
+        }
+        return `${a.action} ${a.name}`.localeCompare(`${b.action} ${b.name}`);
+      });
+    
+    console.log(`Returning top 5 recommendations from ${sortedRecommendations.length} total`);
+    
+    // Return top 5
+    return sortedRecommendations.slice(0, 5);
+  }, [clientData]);
+
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Action Plan</h1>
+        <p className="text-gray-600">
+          Top dietary recommendations based on your biomarker results.
+        </p>
+      </div>
+
+      {clientData.size === 0 ? (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Info className="w-5 h-5 text-blue-600" />
+            <h3 className="font-semibold text-blue-900">No Client Data Loaded</h3>
+          </div>
+          <p className="text-blue-800 text-sm">
+            Upload a CSV file with client biomarker data to see personalized action plan recommendations.
+          </p>
+        </div>
+      ) : actionPlan.length === 0 ? (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Info className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-green-900">All Biomarkers In Range</h3>
+          </div>
+          <p className="text-green-800 text-sm">
+            Great! All your biomarkers appear to be in normal ranges. No specific dietary recommendations needed at this time.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {actionPlan.map((recommendation, index) => (
+            <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {index + 1}. {recommendation.action.charAt(0).toUpperCase() + recommendation.action.slice(1)} {recommendation.name}
+                </h3>
+                <div className="text-sm text-gray-600">
+                  Targets {recommendation.targetBiomarkers.length} biomarker{recommendation.targetBiomarkers.length !== 1 ? 's' : ''} | Weight Score: {recommendation.totalWeight}
+                  {recommendation.targetBiomarkers.length > 0 }
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-800 mb-2">Target Biomarkers:</h4>
+                <div className="space-y-1">
+                  {recommendation.targetBiomarkers.map((biomarker, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-700">{biomarker.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          biomarker.color === 'red',
+                          biomarker.color === 'yellow', 
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {biomarker.color === 'red' ? 'Out of range' : 
+                           biomarker.color === 'yellow' ? 'Borderline' : 'In range'}
+                          {biomarker.level && (
+                            <span className="ml-1 font-medium">({biomarker.level})</span>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -469,6 +610,19 @@ const Sidebar = ({ enrichedData, selectedItem, onSelectItem, onUpload, hasData }
             </div>
           </button>
 
+          {/* Action Plan */}
+          <button
+            onClick={() => onSelectItem('action-plan')}
+            className={`w-full text-left px-3 py-2 rounded-md mb-2 transition-colors ${
+              selectedItem === 'action-plan' ? 'bg-blue-100 text-blue-900' : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ClipboardList className="w-4 h-4" />
+              <span className="font-medium">Action Plan (beta)</span>
+            </div>
+          </button>
+
           {/* Supergroups */}
           {enrichedData.map((supergroup) => {
             const isSupergroupExpanded = expandedSupergroups[supergroup.name];
@@ -560,10 +714,30 @@ export default function BiomarkerApp() {
   const clientMap = useMemo(() => {
     const map = new Map();
     if (clientRows) {
+      console.log("Building clientMap from", clientRows.length, "rows");
+      
+      const colorCounts = {};
+      const levelCounts = {};
+      
       for (const r of clientRows) {
         if (!r.MEASURE_NAME) continue;
         map.set(r.MEASURE_NAME, r);
+        
+        // Count colors and levels
+        const color = (r.COLOR || '').toString().toLowerCase();
+        const level = (r.LEVEL || '').toString().toLowerCase();
+        colorCounts[color] = (colorCounts[color] || 0) + 1;
+        levelCounts[level] = (levelCounts[level] || 0) + 1;
+        
+        // Log ALL red and yellow biomarkers
+        if (color === 'red' || color === 'yellow') {
+          console.log(`Found problematic biomarker: ${r.MEASURE_NAME}, COLOR: "${r.COLOR}", LEVEL: "${r.LEVEL}"`);
+        }
       }
+      
+      console.log("ClientMap built with", map.size, "entries");
+      console.log("Color distribution:", colorCounts);
+      console.log("Level distribution:", levelCounts);
     }
     return map;
   }, [clientRows]);
@@ -627,8 +801,11 @@ export default function BiomarkerApp() {
       if (!Object.prototype.hasOwnProperty.call(rows[0] || {}, "MEASURE_NAME")) {
         throw new Error('Client CSV missing required column: "MEASURE_NAME"');
       }
+      if (!Object.prototype.hasOwnProperty.call(rows[0] || {}, "LEVEL")) {
+        throw new Error('Client CSV missing required column: "LEVEL" - this field is needed to determine if biomarkers are high or low');
+      }
       
-      setClientRows(rows.filter((r) => r.MEASURE_NAME));
+      setClientRows(rows.filter((r) => r.MEASURE_NAME && r.LEVEL));
     } catch (e) {
       setError(e?.message || "Failed to parse client CSV");
     }
@@ -671,6 +848,8 @@ export default function BiomarkerApp() {
         
         {selectedSubgroup ? (
           <SubgroupDetail subgroup={selectedSubgroup} clientData={clientMap} />
+        ) : selectedItem === 'action-plan' ? (
+          <ActionPlan clientData={clientMap} />
         ) : (
           <ExecutiveSummary enrichedData={enrichedData} clientData={clientMap} />
         )}
