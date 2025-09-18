@@ -6,7 +6,7 @@ export default defineConfig({
 
   plugins: [react()],
 
-  base: '/coaching-app/',
+  base: '/fitness-classic/',
 
 })
 
