@@ -603,25 +603,43 @@ export default function BiomarkerApp() {
     const scores = enrichedData.map(s => s.score).filter(s => s !== null);
     if (scores.length === 0) return "Upload biomarker data to see your personalized fitness insights";
     
-    const issues = [];
-    const strengths = [];
+    const optimal = [];
+    const needsSupport = [];
+    const needsAttention = [];
     
     enrichedData.forEach(system => {
       if (system.score !== null) {
-        if (system.score < 60) issues.push(system.name);
-        if (system.score >= 80) strengths.push(system.name);
+        const category = getScoreCategory(system.score);
+        if (category === 'optimal') optimal.push(system.name);
+        else if (category === 'needs-support') needsSupport.push(system.name);
+        else if (category === 'needs-attention') needsAttention.push(system.name);
       }
     });
     
-    if (issues.length > 0 && strengths.length > 0) {
-      return `${strengths.join(' and ')} looking strong. ${issues.join(' and ')} need attention.`;
-    } else if (issues.length > 0) {
-      return `${issues.join(' and ')} need attention to optimize your fitness.`;
-    } else if (strengths.length > 0) {
-      return `All systems are performing well.`;
-    } else {
-      return 'Most systems in good shape. Focus on consistency.';
+    // If all systems have the same status
+    if (optimal.length === 3) return "All systems are optimal.";
+    if (needsSupport.length === 3) return "All systems need support.";
+    if (needsAttention.length === 3) return "All systems need attention.";
+    
+    // Build status message for mixed scenarios
+    const parts = [];
+    
+    if (optimal.length > 0) {
+      const systemText = optimal.length === 1 ? 'system is' : 'systems are';
+      parts.push(`${optimal.join(' and ')} ${systemText} optimal`);
     }
+    
+    if (needsSupport.length > 0) {
+      const systemText = needsSupport.length === 1 ? 'system needs' : 'systems need';
+      parts.push(`${needsSupport.join(' and ')} ${systemText} support`);
+    }
+    
+    if (needsAttention.length > 0) {
+      const systemText = needsAttention.length === 1 ? 'system needs' : 'systems need';
+      parts.push(`${needsAttention.join(' and ')} ${systemText} attention`);
+    }
+    
+    return parts.join('. ') + '.';
   };
 
   return (
@@ -695,9 +713,6 @@ export default function BiomarkerApp() {
               colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-600'
             }`}>
               {getSummaryTagline()}
-            </div>
-            <div className="mt-2 text-sm font-medium text-blue-600">
-              Current Color Scheme: {colorScheme === 'molecular-you' ? 'Molecular You' : 'Level Method'}
             </div>
           </div>
           
