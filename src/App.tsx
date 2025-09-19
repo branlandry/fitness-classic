@@ -238,7 +238,7 @@ const GroupCard = ({ group, system, isExpanded, onToggle, onSubgroupClick, color
         className="p-4 cursor-pointer"
         onClick={onToggle}
       >
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-gray-900 flex-1 pr-4">{group.name}</h3>
           <div className="flex items-center gap-2">
             <div 
@@ -255,15 +255,9 @@ const GroupCard = ({ group, system, isExpanded, onToggle, onSubgroupClick, color
             >
               {group.score !== null ? group.score : '--'}
             </div>
-          </div>
-        </div>
-        
-        <div className="flex items-start justify-between">
-          <p className={`text-sm leading-relaxed flex-1 pr-4 ${
-            colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-600'
-          }`}>{group.description}</p>
-          <div className={`text-gray-400 transition-transform duration-200 text-sm mt-1 ${isExpanded ? 'rotate-180' : ''}`}>
-            ▼
+            <div className={`text-gray-400 transition-transform duration-200 text-sm ml-2 ${isExpanded ? 'rotate-180' : ''}`}>
+              ▼
+            </div>
           </div>
         </div>
       </div>
@@ -272,40 +266,46 @@ const GroupCard = ({ group, system, isExpanded, onToggle, onSubgroupClick, color
         <div className={`px-4 pb-4 border-t ${
           colorScheme === 'level-method' ? 'border-gray-500' : 'border-gray-100'
         }`}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-            {group.subgroups.map((subgroup, idx) => {
-              const subCategory = getScoreCategory(subgroup.score);
-              const subColor = getCategoryColor(subCategory, colorScheme, subgroup.score);
-              return (
-                <div
-                  key={idx}
-                  className={`border rounded-xl p-3 text-center cursor-pointer transition-all duration-200 ${
-                    colorScheme === 'level-method' 
-                      ? 'bg-gray-300 border-gray-500 hover:bg-gray-400 hover:border-gray-600' 
-                      : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSubgroupClick(subgroup, group.name, system);
-                  }}
-                >
-                  <div className="font-semibold text-gray-900 text-sm mb-2 leading-tight">
-                    {subgroup.name}
-                  </div>
-                  <div 
-                    className="text-xl font-bold mb-1"
-                    style={{ color: subColor }}
+          <div className="pt-4">
+            <p className={`text-sm leading-relaxed mb-4 ${
+              colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-600'
+            }`}>{group.description}</p>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {group.subgroups.map((subgroup, idx) => {
+                const subCategory = getScoreCategory(subgroup.score);
+                const subColor = getCategoryColor(subCategory, colorScheme, subgroup.score);
+                return (
+                  <div
+                    key={idx}
+                    className={`border rounded-xl p-3 text-center cursor-pointer transition-all duration-200 ${
+                      colorScheme === 'level-method' 
+                        ? 'bg-gray-300 border-gray-500 hover:bg-gray-400 hover:border-gray-600' 
+                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSubgroupClick(subgroup, group.name, system);
+                    }}
                   >
-                    {subgroup.score !== null ? subgroup.score : '--'}
+                    <div className="font-semibold text-gray-900 text-sm mb-2 leading-tight">
+                      {subgroup.name}
+                    </div>
+                    <div 
+                      className="text-xl font-bold mb-1"
+                      style={{ color: subColor }}
+                    >
+                      {subgroup.score !== null ? subgroup.score : '--'}
+                    </div>
+                    <div className={`text-xs ${
+                      colorScheme === 'level-method' ? 'text-gray-600' : 'text-gray-500'
+                    }`}>
+                      {subgroup.markers.length} biomarkers
+                    </div>
                   </div>
-                  <div className={`text-xs ${
-                    colorScheme === 'level-method' ? 'text-gray-600' : 'text-gray-500'
-                  }`}>
-                    {subgroup.markers.length} biomarkers
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -315,6 +315,8 @@ const GroupCard = ({ group, system, isExpanded, onToggle, onSubgroupClick, color
 
 // Detail panel component
 const DetailPanel = ({ subgroup, group, system, onClose, clientData, colorScheme }) => {
+  const [expandedCategories, setExpandedCategories] = useState(new Set(['needs-attention', 'needs-support']));
+
   if (!subgroup) return null;
 
   const markerDetails = subgroup.markers.map(markerName => {
@@ -331,11 +333,12 @@ const DetailPanel = ({ subgroup, group, system, onClose, clientData, colorScheme
     };
   });
 
+  // Group markers by their COLOR field, not score category
   const groupedMarkers = {
-    'needs-attention': markerDetails.filter(m => getScoreCategory(m.score) === 'needs-attention'),
-    'needs-support': markerDetails.filter(m => getScoreCategory(m.score) === 'needs-support'),
-    'optimal': markerDetails.filter(m => getScoreCategory(m.score) === 'optimal'),
-    'no-data': markerDetails.filter(m => getScoreCategory(m.score) === 'no-data')
+    'needs-attention': markerDetails.filter(m => m.color === 'red'),
+    'needs-support': markerDetails.filter(m => m.color === 'yellow'),
+    'optimal': markerDetails.filter(m => m.color === 'green'),
+    'no-data': markerDetails.filter(m => !m.color || (m.color !== 'red' && m.color !== 'yellow' && m.color !== 'green'))
   };
 
   const getCategoryLabel = (category) => {
@@ -345,6 +348,16 @@ const DetailPanel = ({ subgroup, group, system, onClose, clientData, colorScheme
       case 'optimal': return 'Optimal';
       default: return 'No Data';
     }
+  };
+
+  const toggleCategory = (category) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(category)) {
+      newExpanded.delete(category);
+    } else {
+      newExpanded.add(category);
+    }
+    setExpandedCategories(newExpanded);
   };
 
   return (
@@ -369,19 +382,7 @@ const DetailPanel = ({ subgroup, group, system, onClose, clientData, colorScheme
           ×
         </button>
         <div className="pr-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">{subgroup.name}</h2>
-          <div className={`flex items-center gap-2 text-sm mb-2 ${
-            colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-600'
-          }`}>
-            <span className="font-medium">{group}</span>
-            <span>•</span>
-            <span>{system}</span>
-          </div>
-          <div className={`text-sm font-medium ${
-            colorScheme === 'level-method' ? 'text-gray-800' : 'text-gray-700'
-          }`}>
-            {markerDetails.length} biomarker{markerDetails.length !== 1 ? 's' : ''}
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900">{subgroup.name}</h2>
         </div>
       </div>
       
@@ -389,83 +390,247 @@ const DetailPanel = ({ subgroup, group, system, onClose, clientData, colorScheme
         <div className={`mb-8 p-4 rounded-xl border ${
           colorScheme === 'level-method' 
             ? 'bg-gray-300 border-gray-500' 
-            : 'bg-blue-50 border-blue-100'
+            : 'bg-gray-50 border-gray-100'
         }`}>
-          <p className={`text-sm leading-relaxed ${
-            colorScheme === 'level-method' ? 'text-gray-800' : 'text-blue-900'
+          <p className={`text-sm leading-relaxed mb-6 ${
+            colorScheme === 'level-method' ? 'text-gray-800' : 'text-gray-900'
           }`}>
             {subgroup.description}
           </p>
+          
+          {(() => {
+            // Use the pre-calculated subgroup score from the enriched data
+            const subgroupScore = subgroup.score;
+            const scoreCategory = getScoreCategory(subgroupScore);
+            
+            // Get coaching data from biomarker structure - need to find it in the original structure
+            let coaching = null;
+            
+            // Search through the biomarker structure to find the coaching data
+            Object.values(biomarkerStructure).forEach(supergroupData => {
+              Object.values(supergroupData.groups).forEach(groupData => {
+                Object.entries(groupData.subgroups).forEach(([subgroupName, subgroupData]) => {
+                  if (subgroupName === subgroup.name) {
+                    coaching = subgroupData.coaching;
+                  }
+                });
+              });
+            });
+            
+            console.log('Debug - subgroup name:', subgroup.name);
+            console.log('Debug - subgroupScore:', subgroupScore);
+            console.log('Debug - scoreCategory:', scoreCategory);
+            console.log('Debug - coaching data:', coaching);
+            
+            if (!coaching || !scoreCategory || scoreCategory === 'no-data') {
+              return (
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-sm mb-2">Debug Info:</h4>
+                    <p className={`text-sm leading-relaxed ${
+                      colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-700'
+                    }`}>
+                      Score: {subgroupScore}, Category: {scoreCategory}, Has Coaching: {coaching ? 'Yes' : 'No'}
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+            
+            const coachingKey = scoreCategory === 'optimal' ? 'optimal' : 
+                              scoreCategory === 'needs-support' ? 'needsSupport' : 'needsAttention';
+            const coachingData = coaching[coachingKey];
+            
+            console.log('Debug - coachingKey:', coachingKey);
+            console.log('Debug - coachingData:', coachingData);
+            
+            if (!coachingData) {
+              return (
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-sm mb-2">Debug Info:</h4>
+                    <p className={`text-sm leading-relaxed ${
+                      colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-700'
+                    }`}>
+                      No coaching data found for key: {coachingKey}
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+            
+            return (
+              <div className="space-y-4">
+                {coachingData.healthContext && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-sm mb-2">Health Context:</h4>
+                    <p className={`text-sm leading-relaxed ${
+                      colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-700'
+                    }`}>
+                      {coachingData.healthContext}
+                    </p>
+                  </div>
+                )}
+                
+                {coachingData.implication && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-sm mb-2">Training Impact:</h4>
+                    <p className={`text-sm leading-relaxed ${
+                      colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-700'
+                    }`}>
+                      {coachingData.implication}
+                    </p>
+                  </div>
+                )}
+                
+                {coachingData.action && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-sm mb-2">Recommended Actions:</h4>
+                    <p className={`text-sm leading-relaxed ${
+                      colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-700'
+                    }`}>
+                      {coachingData.action}
+                    </p>
+                  </div>
+                )}
+                
+                {coachingData.tips && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-sm mb-2">Coach Tips:</h4>
+                    <p className={`text-sm leading-relaxed ${
+                      colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-700'
+                    }`}>
+                      {coachingData.tips}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {Object.entries(groupedMarkers).map(([category, markers]) => {
             if (markers.length === 0) return null;
             
-            // For category headers, use the first marker's score if available
-            const firstMarkerScore = markers.length > 0 ? markers[0].score : null;
-            const categoryColor = getCategoryColor(category, colorScheme, firstMarkerScore);
+            const isExpanded = expandedCategories.has(category);
+            // For color-based categories, use the category to determine color
+            let categoryColor;
+            switch(category) {
+              case 'needs-attention': categoryColor = MOLECULAR_YOU_COLORS['needs-attention']; break;
+              case 'needs-support': categoryColor = MOLECULAR_YOU_COLORS['needs-support']; break;
+              case 'optimal': categoryColor = MOLECULAR_YOU_COLORS['optimal']; break;
+              default: categoryColor = MOLECULAR_YOU_COLORS['no-data']; break;
+            }
             
             return (
-              <div key={category}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: categoryColor }}
-                  />
-                  <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">
-                    {getCategoryLabel(category)} ({markers.length})
-                  </h3>
-                </div>
-                
-                <div className="space-y-3">
-                  {markers.map((marker, idx) => {
-                    const markerCategory = getScoreCategory(marker.score);
-                    const markerColor = getCategoryColor(markerCategory, colorScheme, marker.score);
-                    const backgroundColor = getDetailPanelBgColor(markerCategory, colorScheme);
-                    
-                    return (
+              <div key={category} className={`border rounded-lg ${
+                colorScheme === 'level-method' ? 'border-gray-400' : 'border-gray-200'
+              }`}>
+                <button
+                  onClick={() => toggleCategory(category)}
+                  className={`w-full p-4 text-left transition-colors ${
+                    colorScheme === 'level-method' 
+                      ? 'hover:bg-gray-300' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
                       <div 
-                        key={idx} 
-                        className={`rounded-lg border transition-all duration-200 hover:shadow-sm cursor-pointer ${
-                          colorScheme === 'level-method' ? 'hover:bg-gray-400' : ''
-                        }`}
-                        style={{ 
-                          backgroundColor: colorScheme === 'level-method' ? '#E5E7EB' : backgroundColor,
-                          borderColor: colorScheme === 'level-method' ? '#9CA3AF' : markerColor + '30'
-                        }}
-                      >
-                        <div className="p-3">
-                          <div className="flex justify-between items-center">
-                            <h4 className="font-semibold text-gray-900 text-sm leading-tight flex-1 pr-3">
-                              {marker.name}
-                            </h4>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              <span className={`text-xs uppercase tracking-wide ${
-                                colorScheme === 'level-method' ? 'text-gray-600' : 'text-gray-500'
-                              }`}>Score:</span>
-                              <div 
-                                className="text-lg font-bold"
-                                style={{ color: markerColor }}
-                              >
-                                {marker.score !== null ? marker.score : '--'}
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: categoryColor }}
+                      />
+                      <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">
+                        {getCategoryLabel(category)} ({markers.length})
+                      </h3>
+                    </div>
+                    <div className={`text-gray-400 transition-transform duration-200 text-sm ${isExpanded ? 'rotate-180' : ''}`}>
+                      ▼
+                    </div>
+                  </div>
+                </button>
+                
+                {isExpanded && (
+                  <div className={`px-4 pb-4 border-t ${
+                    colorScheme === 'level-method' ? 'border-gray-400' : 'border-gray-200'
+                  }`}>
+                    <div className="space-y-3 pt-3">
+                      {markers.map((marker, idx) => {
+                        // Use the category (based on color) for styling, not the score
+                        let markerColor, backgroundColor;
+                        
+                        if (colorScheme === 'level-method') {
+                          // For Level Method, still use score-based coloring for the score display
+                          const markerCategory = getScoreCategory(marker.score);
+                          markerColor = getCategoryColor(markerCategory, colorScheme, marker.score);
+                          backgroundColor = '#E5E7EB';
+                        } else {
+                          // For Molecular You, use category-based coloring
+                          switch(category) {
+                            case 'needs-attention': 
+                              markerColor = MOLECULAR_YOU_COLORS['needs-attention'];
+                              backgroundColor = '#FEF2F2';
+                              break;
+                            case 'needs-support': 
+                              markerColor = MOLECULAR_YOU_COLORS['needs-support'];
+                              backgroundColor = '#FFFBEB';
+                              break;
+                            case 'optimal': 
+                              markerColor = MOLECULAR_YOU_COLORS['optimal'];
+                              backgroundColor = '#F0F9FF';
+                              break;
+                            default: 
+                              markerColor = MOLECULAR_YOU_COLORS['no-data'];
+                              backgroundColor = '#F9FAFB';
+                              break;
+                          }
+                        }
+                        
+                        return (
+                          <div 
+                            key={idx} 
+                            className={`rounded-lg border transition-all duration-200 hover:shadow-sm cursor-pointer ${
+                              colorScheme === 'level-method' ? 'hover:bg-gray-400' : ''
+                            }`}
+                            style={{ 
+                              backgroundColor,
+                              borderColor: colorScheme === 'level-method' ? '#9CA3AF' : markerColor + '30'
+                            }}
+                          >
+                            <div className="p-3">
+                              <div className="flex justify-between items-center">
+                                <h4 className="font-semibold text-gray-900 text-sm leading-tight flex-1 pr-3">
+                                  {marker.name}
+                                </h4>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <span className={`text-xs uppercase tracking-wide ${
+                                    colorScheme === 'level-method' ? 'text-gray-600' : 'text-gray-500'
+                                  }`}>Score:</span>
+                                  <div 
+                                    className="text-lg font-bold"
+                                    style={{ color: markerColor }}
+                                  >
+                                    {marker.score !== null ? marker.score : '--'}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className={`mt-2 text-xs ${
+                                colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-600'
+                              }`}>
+                                <span className="font-medium">Your Value:</span>
+                                <span className="ml-1 font-mono">
+                                  {formatBiomarkerValue(marker.value)}
+                                </span>
                               </div>
                             </div>
                           </div>
-                          
-                          <div className={`mt-2 text-xs ${
-                            colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-600'
-                          }`}>
-                            <span className="font-medium">Your Value:</span>
-                            <span className="ml-1 font-mono">
-                              {formatBiomarkerValue(marker.value)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -713,6 +878,9 @@ export default function BiomarkerApp() {
               colorScheme === 'level-method' ? 'text-gray-700' : 'text-gray-600'
             }`}>
               {getSummaryTagline()}
+            </div>
+            <div className="mt-2 text-sm font-medium text-blue-600">
+              Current Color Scheme: {colorScheme === 'molecular-you' ? 'Molecular You' : 'Level Method'}
             </div>
           </div>
           

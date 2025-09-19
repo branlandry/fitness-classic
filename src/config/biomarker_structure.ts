@@ -1,19 +1,19 @@
 // biomarkerStructure.ts - Static biomarker data structure
 export const biomarkerStructure = {
   "Health": {
-    description: "Blood markers that reveal how effectively your cardiovascular and neurological systems deliver oxygen, clear metabolic waste, and maintain the mental drive essential for consistent training performance. These indicators show whether the body's foundational systems can support demanding endurance work and sustained training motivation.",
+    description: "Markers that reveal how effectively your cardiovascular and neurological systems deliver oxygen, clear metabolic waste, and maintain the mental drive essential for consistent training performance. These indicators show whether the body's foundational systems can support demanding endurance work and sustained training motivation.",
     groups: {
       "Cardiovascular Health": {
-        description: "Blood markers that reveal cardiovascular system readiness for training demands, showing how efficiently nutrients reach working muscles and waste products are cleared during exercise. These indicators determine whether circulation can support higher training volumes and faster recovery between sessions.",
+        description: "Markers that reveal cardiovascular system readiness for training demands, showing how efficiently nutrients reach working muscles and waste products are cleared during exercise. These indicators determine whether circulation can support higher training volumes and faster recovery between sessions.",
         subgroups: {
           "Blood Vessel Health": {
-            description: "Blood markers reflecting blood vessel lining integrity that determine circulation efficiency and cardiovascular training capacity.",
+            description: "Markers reflecting blood vessel lining health. They determine blood circulation efficiency and cardiovascular training capacity.",
             markers: ["Intercellular adhesion molecule 1", "L-selectin", "Cadherin-5", "Thrombospondin-1", "Angiogenin", "Vasorin", "von Willebrand Factor", "Pigment epithelium-derived factor", "Fibronectin"],
             coaching: {
               optimal: {
-                implication: "Blood markers showing healthy vessel function support efficient nutrient delivery, better endurance, and superior recovery.",
+                implication: "Healthy blood vessel function supports efficient nutrient delivery, better endurance, and superior recovery.",
                 action: "Incorporate higher-volume cardio, longer training sessions, and faster-paced conditioning work.",
-                healthContext: "Healthy vessel markers show lower risk of hypertension and improved circulation."
+                healthContext: "Healthy vessel markers lower your risk of hypertension and help improve circulation."
               },
               needsSupport: {
                 action: "Moderate aerobic exercise with gradual intensity increases, monitor blood pressure responses, focus on consistency over intensity.",
@@ -28,13 +28,13 @@ export const biomarkerStructure = {
             }
           },
           "Blood Flow Capacity": {
-            description: "Blood markers supporting blood vessel dilation and circulation enhancement that directly impact muscle pumps, endurance capacity, and exercise performance.",
+            description: "Markers supporting blood vessel dilation and circulation. They directly impact muscle pumps, endurance capacity, and exercise performance.",
             markers: ["Arginine", "Citrulline", "Ornithine", "Asymmetric dimethylarginine", "Acetyl-Ornithine"],
             coaching: {
               optimal: {
-                implication: "Blood markers supporting nitric oxide production enhance muscle pumps, endurance, and exercise capacity.",
+                implication: "Healthy blood flow markers enhance muscle pumps, endurance, and exercise capacity.",
                 action: "Push cardiovascular limits with interval training, circuit work, and high-volume resistance protocols.",
-                healthContext: "Healthy nitric oxide markers show improved exercise capacity and cardiovascular health."
+                healthContext: "Healthy blood flow markers show improved exercise capacity and overall cardiovascular health."
               },
               needsSupport: {
                 action: "Steady-state cardio with brief intervals, include nitric oxide supporting foods, progress intensity based on response.",
@@ -49,11 +49,11 @@ export const biomarkerStructure = {
             }
           },
           "Clotting Balance": {
-            description: "Blood markers reflecting circulation safety and clotting balance that determine training intensity tolerance and injury recovery potential.",
+            description: "Markers reflecting blood clotting balance. They determine training intensity tolerance and injury recovery potential.",
             markers: ["Fibrinogen alpha chain", "Fibrinogen beta chain", "Fibrinogen gamma chain", "Prothrombin", "Coagulation factor IX", "Coagulation factor X", "Coagulation factor XI", "Coagulation factor XII", "Coagulation factor XIII A chain", "Coagulation factor XIII B chain", "Plasminogen", "Protein S", "Antithrombin-III"],
             coaching: {
               optimal: {
-                implication: "Blood clotting markers in optimal range support safer high-intensity training, better tissue repair, and reduced injury downtime.",
+                implication: "Optimal blood clotting markers support safer high-intensity training, better tissue repair, and reduced injury downtime.",
                 action: "Progress confidently with demanding workouts, knowing circulation and healing are well-supported.",
                 healthContext: "Healthy clotting regulation shows lower risk of cardiovascular events or healing issues."
               },
@@ -72,68 +72,68 @@ export const biomarkerStructure = {
         }
       },
       "Mental & Neural Readiness": {
-        description: "Blood markers reflecting neurotransmitter production and brain chemistry balance that directly impact training motivation, stress resilience, and workout consistency. These indicators show whether neurological systems support challenging training and maintain positive training mindset.",
+        description: "Markers reflecting neurotransmitter production and brain chemistry balance that directly impact training motivation, stress resilience, and workout consistency. They show whether neurological systems support challenging training and ability to maintain a positive training mindset.",
         subgroups: {
           "Training Motivation": {
-            description: "Blood markers supporting mood stability, training motivation, and positive mindset that directly impact program adherence and workout consistency.",
+            description: "Markers supporting mood stability, training motivation, and positive mindset that directly impact program adherence and workout consistency.",
             markers: ["Serotonin", "Tryptophan", "Kynurenine"],
             coaching: {
               optimal: {
-                implication: "Blood markers supporting serotonin production promote consistent motivation, positive mindset, and better program adherence.",
+                implication: "Optimal training motivation markers promote consistent motivation, positive mindset, and better program adherence.",
                 action: "Leverage good mood stability - try new challenges, group fitness, or mentally demanding training protocols.",
-                healthContext: "Healthy serotonin markers show improved mood stability and sleep quality."
+                healthContext: "Healthy training motivation markers show improved mood stability and sleep quality."
               },
               needsSupport: {
                 action: "Maintain enjoyable exercise variety, track mood responses to training, use social support when possible.",
                 tips: "Monitor mood patterns with training, encourage outdoor activities when possible, track sleep quality.",
-                healthContext: "Low serotonin markers may indicate mood issues, sleep disruption, and reduced motivation."
+                healthContext: "Abnormal training motivation markers may indicate mood issues, sleep disruption, and reduced motivation."
               },
               needsAttention: {
                 action: "Keep workouts fun and social, avoid monotonous routines, focus on mood-boosting activities.",
                 tips: "Monitor training enjoyment, encourage outdoor exercise, and track sleep quality alongside mood.",
-                healthContext: "Low serotonin markers may indicate mood issues, sleep disruption, and reduced motivation."
+                healthContext: "Abnormal training motivation markers may indicate mood issues, sleep disruption, and reduced motivation."
               }
             }
           },
           "Stress Recovery": {
-            description: "Blood markers supporting stress management, recovery readiness, and nervous system balance that determine training stress tolerance and adaptation capacity.",
+            description: "Markers supporting stress management, recovery readiness, and nervous system balance that determine training stress tolerance and adaptation capacity.",
             markers: ["Gamma-aminobutyric acid"],
             coaching: {
               optimal: {
-                implication: "Blood markers supporting relaxation pathways allow better stress management, deeper recovery, and sustainable training.",
+                implication: "Markers supporting stress recovery allow better stress management, deeper recovery, and sustainable training.",
                 action: "Take advantage of good stress resilience - add challenging workouts knowing recovery will be effective.",
                 healthContext: "Healthy GABA markers show improved stress management and recovery capacity."
               },
               needsSupport: {
                 action: "Balance challenging work with adequate recovery, include relaxation techniques, avoid overstimulating environments.",
                 tips: "Teach basic stress management techniques, create calm training environments, monitor stress responses.",
-                healthContext: "Low GABA support may indicate anxiety, sleep issues, and impaired stress recovery."
+                healthContext: "Low stress reocovery support may indicate anxiety, sleep issues, and impaired stress recovery."
               },
               needsAttention: {
                 action: "Emphasize relaxation techniques, yoga, meditation, and avoid overstimulating training environments.",
                 tips: "Teach breathing techniques, promote calm training spaces, and monitor stress responses.",
-                healthContext: "Low GABA support may indicate anxiety, sleep issues, and impaired stress recovery."
+                healthContext: "Low stress recovery support may indicate anxiety, sleep issues, and impaired stress recovery."
               }
             }
           },
           "Mental Drive": {
-            description: "Blood markers supporting motivation, focus, and drive that directly impact training intensity, skill acquisition, and consistent workout performance.",
+            description: "Markers supporting motivation, focus, and drive. They impact training intensity, skill acquisition, and consistent workout performance.",
             markers: ["Tyrosine", "Phenylalanine"],
             coaching: {
               optimal: {
-                implication: "Blood markers supporting dopamine production enhance motivation, focus, and drive for consistent training.",
+                implication: "Markers supporting dopamine production enhance motivation, focus, and drive for consistent training.",
                 action: "Leverage high motivation - introduce challenging skills, competitive elements, or complex movement patterns.",
-                healthContext: "Healthy dopamine precursors show improved motivation and movement control."
+                healthContext: "Healthy mental drive markers show improved motivation and movement control."
               },
               needsSupport: {
                 action: "Maintain engaging variety in training, use goal-setting and progress tracking, avoid overtraining that impacts motivation.",
                 tips: "Use achievement-based programs, track progress visibly, include variety and challenge progression.",
-                healthContext: "Low dopamine precursors may indicate reduced motivation, mood, and movement control."
+                healthContext: "Low mental drive markers may indicate reduced motivation, mood, and movement control."
               },
               needsAttention: {
                 action: "Focus on enjoyable, low-pressure activities. Avoid overtraining that could further impact motivation.",
                 tips: "Use variety, social support, and achievable micro-goals to rebuild training enthusiasm.",
-                healthContext: "Low dopamine precursors may indicate reduced motivation, mood, and movement control."
+                healthContext: "Low mental drive markers may indicate reduced motivation, mood, and movement control."
               }
             }
           }
@@ -142,17 +142,17 @@ export const biomarkerStructure = {
     }
   },
   "Performance": {
-    description: "Blood markers reflecting your body's muscle-building machinery, energy production capacity, and strength development potential. These indicators reveal whether cellular processes are primed for muscle growth, optimal workout fueling, and progressive training demands.",
+    description: "Markers reflecting your body's muscle-building machinery, energy production capacity, and strength development potential. These indicators reveal whether cellular processes are primed for muscle growth, optimal workout fueling, and progressive training demands.",
     groups: {
       "Muscle & Strength Systems": {
-        description: "Blood markers revealing protein synthesis capacity, muscle building potential, and strength development readiness. These indicators show whether cellular processes can support progressive muscle-building protocols and handle increased training volumes for optimal strength gains.",
+        description: "Markers revealing protein synthesis capacity, muscle building potential, and strength development readiness. These indicators show whether cellular processes can support progressive muscle-building protocols and handle increased training volumes for optimal strength gains.",
         subgroups: {
           "Muscle Building": {
-            description: "Blood markers reflecting the balance between muscle building and breakdown processes that determine training volume tolerance and strength development potential.",
+            description: "Markers reflecting the balance between muscle building and breakdown processes that determine training volume tolerance and strength development potential.",
             markers: ["Methylhistidine", "Creatine", "Creatinine", "Insulin-like growth factor-binding protein 2", "Insulin-like growth factor-binding protein 3", "Insulin-like growth factor-binding protein complex acid labile subunit"],
             coaching: {
               optimal: {
-                implication: "Blood markers of protein synthesis and breakdown in balance allow optimal muscle growth, strength gains, and injury prevention.",
+                implication: "Markers of protein synthesis and breakdown in balance allow optimal muscle growth, strength gains, and injury prevention.",
                 action: "Implement progressive muscle-building protocols, higher training volumes, and advanced progression strategies.",
                 healthContext: "Healthy muscle protein markers show proper muscle maintenance and growth capacity."
               },
@@ -169,7 +169,7 @@ export const biomarkerStructure = {
             }
           },
           "Building Blocks": {
-            description: "Blood markers providing essential building blocks for muscle protein synthesis that directly impact recovery speed, muscle growth, and training adaptation.",
+            description: "Markers providing essential building blocks for muscle protein synthesis. They directly impact recovery speed, muscle growth, and training adaptation.",
             markers: ["Leucine", "Isoleucine", "Valine", "Lysine", "Methionine", "Histidine", "Glutamine"],
             coaching: {
               optimal: {
@@ -190,11 +190,11 @@ export const biomarkerStructure = {
             }
           },
           "Growth Support": {
-            description: "Blood markers supporting cellular growth, tissue repair, and training adaptation that determine recovery capacity and progression potential.",
+            description: "Markers supporting cellular growth, tissue repair, and training adaptation that determine recovery capacity and progression potential.",
             markers: ["Spermidine", "Putrescine"],
             coaching: {
               optimal: {
-                implication: "Blood markers supporting polyamine pathways facilitate muscle growth, tissue repair, and training adaptation.",
+                implication: "arkers supporting polyamine pathways facilitate muscle growth, tissue repair, and training adaptation.",
                 action: "Leverage growth-supportive environment with progressive overload, skill acquisition, and tissue-building protocols.",
                 healthContext: "Healthy polyamine levels support cellular growth, healing, immune function, and regeneration."
               },
@@ -213,10 +213,10 @@ export const biomarkerStructure = {
         }
       },
       "Energy Systems & Fueling": {
-        description: "Blood markers that reveal metabolic efficiency for different fuel sources during exercise, showing how well carbohydrates, fats, and cellular energy pathways support workout performance. These indicators determine optimal nutrition timing and training intensity based on metabolic readiness.",
+        description: "Markers that reveal metabolic efficiency for different fuel sources during exercise, showing how well carbohydrates, fats, and cellular energy pathways support workout performance. These indicators determine optimal nutrition timing and training intensity based on metabolic readiness.",
         subgroups: {
           "Carb metabolism": {
-            description: "Blood markers reflecting carbohydrate processing efficiency and energy availability that determine workout fueling strategies and training intensity tolerance.",
+            description: "Markers reflecting carbohydrate processing efficiency and energy availability that determine workout fueling strategies and training intensity tolerance.",
             markers: ["Glucose", "Alanine"],
             coaching: {
               optimal: {
@@ -237,7 +237,7 @@ export const biomarkerStructure = {
             }
           },
           "Fat Metabolism": {
-            description: "Blood markers reflecting fat metabolism efficiency and cardiovascular health that support endurance performance and hormone production for training.",
+            description: "Markers reflecting fat metabolism efficiency and cardiovascular health that support endurance performance and hormone production for training.",
             markers: ["Apolipoprotein A-I", "Apolipoprotein A-II", "Apolipoprotein A-IV", "Apolipoprotein C-I", "Apolipoprotein C-II", "Apolipoprotein C-III", "Phospholipid transfer protein", "Clusterin", "Zinc-alpha-2-glycoprotein"],
             coaching: {
               optimal: {
@@ -258,11 +258,11 @@ export const biomarkerStructure = {
             }
           },
           "Cellular Energy": {
-            description: "Blood markers supporting cellular hydration, metabolic efficiency, and energy production that directly impact training capacity and recovery quality.",
+            description: "Markers supporting cellular hydration, metabolic efficiency, and energy production that directly impact training capacity and recovery quality.",
             markers: ["Betaine", "Choline", "Taurine", "Trimethylamine N-oxide"],
             coaching: {
               optimal: {
-                implication: "Blood markers supporting cellular hydration and methylation promote energy production, recovery, and training capacity.",
+                implication: "Markers supporting cellular hydration and methylation promote energy production, recovery, and training capacity.",
                 action: "Take advantage of optimal cellular function - increase training complexity and metabolic demands.",
                 healthContext: "Healthy osmolyte and methylation markers support energy production and cellular function."
               },
@@ -283,13 +283,13 @@ export const biomarkerStructure = {
     }
   },
   "Recovery": {
-    description: "Blood markers that indicate how well your body's repair mechanisms, anti-inflammatory systems, and structural maintenance processes respond to training stress. These indicators show whether recovery systems can handle increased training loads and support consistent adaptation over time.",
+    description: "Markers that indicate how well your body's repair mechanisms, anti-inflammatory systems, and structural maintenance processes respond to training stress. These indicators show whether recovery systems can handle increased training loads and support consistent adaptation over time.",
     groups: {
       "Recovery & Adaptation": {
-        description: "Blood markers reflecting inflammatory control, antioxidant capacity, and tissue repair efficiency after training stress. These indicators show whether recovery mechanisms can handle higher training frequencies and support consistent positive adaptations.",
+        description: "Markers reflecting inflammatory control, antioxidant capacity, and tissue repair efficiency after training stress. These indicators show whether recovery mechanisms can handle higher training frequencies and support consistent positive adaptations.",
         subgroups: {
           "Inflammation & Immune readiness": {
-            description: "Blood markers reflecting inflammatory control and immune system function that determine training frequency tolerance and consistent workout availability.",
+            description: "Markers reflecting inflammatory control and immune system function that determine training frequency tolerance and consistent workout availability.",
             markers: ["C-reactive protein", "Serum amyloid A-4 protein", "Alpha-1-acid glycoprotein 1", "Alpha-1-antichymotrypsin", "Alpha-1-antitrypsin", "Alpha-1B-glycoprotein", "Leucine-rich alpha-2-glycoprotein 1", "Lipopolysaccharide-binding protein", "Serum amyloid P-component", "Protein S100-A9", "Complement C3", "Complement C4-B", "Complement factor B", "Complement factor H"],
             coaching: {
               optimal: {
@@ -310,11 +310,11 @@ export const biomarkerStructure = {
             }
           },
           "Tissue Repair": {
-            description: "Blood markers reflecting structural tissue repair and remodeling capacity that determine training progression safety and injury prevention potential.",
+            description: "Markers reflecting structural tissue repair and remodeling capacity that determine training progression safety and injury prevention potential.",
             markers: ["Fibronectin", "Vitronectin", "Lumican", "Fibulin-1", "Extracellular matrix protein 1", "Proteoglycan 4", "Tetranectin", "trans-OH-Proline"],
             coaching: {
               optimal: {
-                implication: "Blood markers supporting tissue repair promote injury prevention, strength development, and training progression.",
+                implication: "Markers supporting tissue repair promote injury prevention, strength development, and training progression.",
                 action: "Advance training complexity and intensity, knowing tissue adaptation and repair processes are robust.",
                 healthContext: "Healthy tissue repair markers support injury recovery and structural adaptations."
               },
@@ -331,11 +331,11 @@ export const biomarkerStructure = {
             }
           },
           "Stress Defense": {
-            description: "Blood markers reflecting cellular stress management and antioxidant capacity that determine training intensity tolerance and recovery efficiency.",
+            description: "Markers reflecting cellular stress management and antioxidant capacity that determine training intensity tolerance and recovery efficiency.",
             markers: ["Glutathione peroxidase 3", "Peroxiredoxin-2", "Ceruloplasmin", "Methionine-Sulfoxide"],
             coaching: {
               optimal: {
-                implication: "Blood markers showing proper antioxidant balance support training adaptation, cellular health, and exercise improvements.",
+                implication: "Markers showing proper antioxidant balance support training adaptation, cellular health, and exercise improvements.",
                 action: "Push training boundaries safely, knowing cellular repair mechanisms are handling exercise stress effectively.",
                 healthContext: "Balanced oxidative stress supports healthy aging and cellular function."
               },
@@ -354,14 +354,14 @@ export const biomarkerStructure = {
         }
       },
       "Joint & Connective Tissue": {
-        description: "Blood markers revealing structural tissue health, bone density markers, and connective tissue turnover that determine injury risk and loading capacity. These indicators show whether joints and connective tissues can safely handle high-impact training and heavy resistance work.",
+        description: "Markers revealing structural tissue health, bone density markers, and connective tissue turnover that determine injury risk and loading capacity. These indicators show whether joints and connective tissues can safely handle high-impact training and heavy resistance work.",
         subgroups: {
           "Cartilage & Bone Health": {
-            description: "Blood markers reflecting bone density and cartilage health that determine high-impact training capacity and joint loading tolerance.",
+            description: "Markers reflecting bone density and cartilage health that determine high-impact training capacity and joint loading tolerance.",
             markers: ["Cartilage acidic protein 1", "Alpha-2-HS-glycoprotein", "Fetuin-B", "Tetranectin"],
             coaching: {
               optimal: {
-                implication: "Blood markers of bone and cartilage metabolism in healthy ranges support joint health, power development, and injury resilience.",
+                implication: "Markers of bone and cartilage metabolism in healthy ranges support joint health, power development, and injury resilience.",
                 action: "Safely incorporate high-impact activities, plyometrics, and heavy resistance training for bone strengthening.",
                 healthContext: "Healthy bone/cartilage markers support joint health and injury resistance."
               },
@@ -378,11 +378,11 @@ export const biomarkerStructure = {
             }
           },
           "Joint Health": {
-            description: "Blood markers reflecting connective tissue health and remodeling that determine injury risk and capacity for demanding movement patterns.",
+            description: "Markers reflecting connective tissue health and remodeling that determine injury risk and capacity for demanding movement patterns.",
             markers: ["trans-OH-Proline", "Lumican", "Fibulin-1"],
             coaching: {
               optimal: {
-                implication: "Blood markers of collagen synthesis in healthy ranges support joint stability, injury prevention, and tissue repair.",
+                implication: "Markers of collagen synthesis in healthy ranges support joint stability, injury prevention, and tissue repair.",
                 action: "Confidently progress with demanding training, knowing connective tissue adaptation is well-supported.",
                 healthContext: "Healthy collagen markers support joint stability and injury prevention."
               },
