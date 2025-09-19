@@ -879,9 +879,6 @@ export default function BiomarkerApp() {
             }`}>
               {getSummaryTagline()}
             </div>
-            <div className="mt-2 text-sm font-medium text-blue-600">
-              Current Color Scheme: {colorScheme === 'molecular-you' ? 'Molecular You' : 'Level Method'}
-            </div>
           </div>
           
           <div className="flex justify-center gap-12">
